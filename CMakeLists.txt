@@ -3,21 +3,22 @@ cmake_minimum_required(VERSION 2.8)
 # prepare C++11
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
-## add test coverage
-#list( APPEND CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
-
 # show all warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 
-set( ZMQPP_BUILD_EXAMPLES false CACHE BOOL "Build the ZMQPP examples" )
-set( ZMQPP_BUILD_CLIENT false CACHE BOOL "Build the ZMQPP client" )
+set( ZMQPP_BUILD_EXAMPLES false   CACHE BOOL "Build the ZMQPP examples" )
+set( ZMQPP_BUILD_CLIENT   false   CACHE BOOL "Build the ZMQPP client" )
 
-set( ZEROMQ_LIB_DIR "" CACHE STRING "The library directory for libzmq" )
-set( ZEROMQ_INCLUDE_DIR "" CACHE STRING "The include directory for ZMQ" )
+set( ZEROMQ_LIB_DIR       ""      CACHE STRING "The library directory for libzmq" )
+set( ZEROMQ_INCLUDE_DIR   ""      CACHE STRING "The include directory for ZMQ" )
+
+
 
 find_library(ZEROMQ_LIBRARY zmq HINTS ${ZMQ_LIB_DIR})
 find_path(ZEROMQ_INCLUDE zmq.h HINTS ${ZEROMQ_INCLUDE_DIR})
+
+
 
 include_directories(${ZEROMQ_INCLUDE})
 
