@@ -1,6 +1,7 @@
 message(STATUS "${CMAKE_CXX_FLAGS}")
 cmake_minimum_required(VERSION 2.8)
 enable_testing()
+
 # prepare C++11
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
@@ -24,8 +25,9 @@ set( ZEROMQ_LIB_DIR       ""      CACHE PATH "The library directory for libzmq" 
 set( ZEROMQ_INCLUDE_DIR   ""      CACHE PATH "The include directory for ZMQ" )
 set( IS_TRAVIS_CI_BUILD   true    CACHE bool "Defines TRAVIS_CI_BUILD - Should the tests avoid running cases where memory is scarce." )
 
-find_library(ZEROMQ_LIBRARY zmq HINTS ${ZMQ_LIB_DIR})
-find_path(ZEROMQ_INCLUDE zmq.h HINTS ${ZEROMQ_INCLUDE_DIR})
+find_library(ZEROMQ_LIBRARY_STATIC zmq-static PATHS ${ZEROMQ_LIB_DIR})
+find_library(ZEROMQ_LIBRARY_SHARED zmq-static PATHS ${ZEROMQ_LIB_DIR})
+find_path(ZEROMQ_INCLUDE zmq.h PATHS ${ZEROMQ_INCLUDE_DIR})
 
 include_directories(${ZEROMQ_INCLUDE})
 
@@ -42,7 +44,7 @@ endif()
 # libzmqpp
 # --------
 
-set( LIBZMQPP_SOURCES 
+set( LIBZMQPP_SOURCES
   src/zmqpp/actor.cpp
   src/zmqpp/context.cpp
   src/zmqpp/curve.cpp
@@ -61,7 +63,8 @@ add_library( zmqpp_objects OBJECT ${LIBZMQPP_SOURCES})
 add_library( zmqpp SHARED $<TARGET_OBJECTS:zmqpp_objects>)
 add_library( zmqpp-static STATIC $<TARGET_OBJECTS:zmqpp_objects>)
 
-target_link_libraries( zmqpp ${ZEROMQ_LIBRARY} )
+target_link_libraries( zmqpp ${ZEROMQ_LIBRARY_SHARED} )
+target_link_libraries( zmqpp-static ${ZEROMQ_LIBRARY_STATIC} )
 
 # Examples
 # --------
@@ -126,7 +129,7 @@ endif()
 
 if( ZMQPP_BUILD_TESTS )
   # Boost
-  #################################################################
+  # -----
 
   add_executable( zmqpp-test-runner
     src/tests/test_actor.cpp
@@ -149,10 +152,10 @@ endif()
 
 # Install
 # -------
-install(TARGETS zmqpp
+install(TARGETS zmqpp zmqpp-static
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 
-install(DIRECTORY src/zmqpp DESTINATION include/zmqpp
+install(DIRECTORY src/zmqpp DESTINATION include/
         FILES_MATCHING PATTERN "*.hpp")
